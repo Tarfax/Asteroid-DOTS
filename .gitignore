@@ -8,8 +8,11 @@ project.lock.json
 *.user
 *.userosscache
 *.sln.docstates
-*.rar
 *.zip
+SDL2_image-2.0.5/
+SDL2_mixer-2.0.4/
+SDL2_ttf-2.0.15/
+SDL2-2.0.14/
 
 # Build results
 [Dd]ebug/
