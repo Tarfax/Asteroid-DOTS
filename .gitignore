@@ -16,9 +16,8 @@ project.lock.json
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-x64/
-x64/[Dd]ebug
 x86/
+x64/
 bld/
 [Bb]in/
 [Oo]bj/
@@ -264,5 +263,5 @@ Session.vim
 *.opendb
 
 Asteroid-DOTS.sln
-*.vcxproj
-*.filters
+#*.vcxproj
+#*.filters
