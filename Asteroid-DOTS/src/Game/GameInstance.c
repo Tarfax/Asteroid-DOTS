@@ -15,6 +15,7 @@ void InitGame() {
 	explosionTexture = LoadTextureFromId("res/graphics/explosion01.png");
 
 	PlayMusic(0);
+	isInWave = 0;
 
 	ResetGame();
 }
@@ -71,6 +72,8 @@ static void ResetGame() {
 	InitTextElements();
 	enemySpawnTimer = 0;
 	gameResetTimer = FPS * 2;
+	gameInstance.enemyWave = 0;
+	InitNextWave();
 
 	PlaySound(Sound_GameStart, ChannelAny);
 }
@@ -115,7 +118,7 @@ static void InitTextElements() {
 	color.b = 255;
 	color.a = 255;
 
-	//Some magic numbers to place them on the screen
+	//Some magic numbers to place the text on the screen
 
 	Vector2 position;
 	position.x = 8;
@@ -142,10 +145,32 @@ static void InitTextElements() {
 	textElements[Text_EnemyDeaths].position = position;
 
 	textElements[Text_HighScore].size = 69;
-	textElements[Text_HighScore].sprite = GetTextSprite(color, textElements[Text_HighScore].size, "HighScore: %03d", highScore);
-	position.x = 980;
+	textElements[Text_HighScore].sprite = GetTextSprite(color, textElements[Text_HighScore].size, "High Score: %03d", highScore);
+	position.x = 970;
 	position.y = 5;
 	textElements[Text_HighScore].position = position;
+
+	textElements[Text_NextEnemyWave].size = 69;
+	textElements[Text_NextEnemyWave].sprite = GetTextSprite(color, textElements[Text_NextEnemyWave].size, "Wave %i In %01d", gameInstance.enemyWave, (secondsToNextWave / 60));
+	textElements[Text_NextEnemyWave].position.x = SCREEN_WIDTH / 2 - textElements[Text_NextEnemyWave].sprite.width / 2;
+	textElements[Text_NextEnemyWave].position.y = SCREEN_HEIGHT / 2 - textElements[Text_NextEnemyWave].sprite.height / 2;
+}
+
+static void InitNextWave() {
+	isInWave = 0;
+	enemySpawnTimer = FPS / 2;
+	++gameInstance.enemyWave;
+	spawnedEnemiesCap = (15 * gameInstance.enemyWave) / 4;
+	spawnedEnemies = 0;
+	secondsToNextWave = FPS * 4;
+	spawnedEnemiesInternal = 0;
+	hasLastEnemyInWaveSpawned = 0;
+
+	DeleteFontTexture(textElements[Text_NextEnemyWave].sprite.texture);
+	textElements[Text_NextEnemyWave].size = 69;
+	textElements[Text_NextEnemyWave].sprite = GetTextSprite(textElements[Text_NextEnemyWave].sprite.color, textElements[Text_NextEnemyWave].size, "Wave %i In %01d", gameInstance.enemyWave, (secondsToNextWave / 60));
+	textElements[Text_NextEnemyWave].position.x = SCREEN_WIDTH / 2 - textElements[Text_NextEnemyWave].sprite.width / 2;
+	textElements[Text_NextEnemyWave].position.y = SCREEN_HEIGHT / 2 - textElements[Text_NextEnemyWave].sprite.height / 2;
 }
 
 static void Update() {
@@ -153,12 +178,19 @@ static void Update() {
 	UpdateStarfield();
 	UpdatePlayer();
 	UpdateEnemies();
+
 	UpdateBullets();
 	UpdateExplosions();
 	UpdateDebris();
 	UpdateScorePads();
 
-	SpawnEnemies();
+	if (isInWave == 1) {
+		UpdateCountdownWaveCounter();
+		SpawnEnemies();
+	}
+	else {
+		UpdateCountdownWaveCounter();
+	}
 
 	if (player == NULL && --gameResetTimer <= 0) {
 		ResetGame();
@@ -275,11 +307,17 @@ static void UpdateEnemies() {
 			free(enemy);
 			enemy = previousEnemy;
 
+			--spawnedEnemiesInternal;
+			
 		}
 
 		previousEnemy = enemy;
 	}
 
+	if (spawnedEnemiesInternal <= 0 && hasLastEnemyInWaveSpawned == 1 && isInWave == 1) {
+		InitNextWave();
+		hasLastEnemyInWaveSpawned = 0;
+	}
 }
 
 static void UpdateStarfield() {
@@ -417,6 +455,34 @@ static void UpdateScorePads() {
 	}
 }
 
+static void UpdateCountdownWaveCounter() {
+	if (--secondsToNextWave <= FPS && isInWave == 0) {
+		isInWave = 1;
+		removeWaveSecondsTimer = FPS * 2;
+		DeleteFontTexture(textElements[Text_NextEnemyWave].sprite.texture);
+		textElements[Text_NextEnemyWave].size = 69;
+		textElements[Text_NextEnemyWave].sprite = GetTextSprite(textElements[Text_NextEnemyWave].sprite.color, textElements[Text_NextEnemyWave].size, "GO!");
+		textElements[Text_NextEnemyWave].position.x = SCREEN_WIDTH / 2 - textElements[Text_NextEnemyWave].sprite.width / 2;
+		textElements[Text_NextEnemyWave].position.y = SCREEN_HEIGHT / 2 - textElements[Text_NextEnemyWave].sprite.height / 2;
+	}
+	else if (secondsToNextWave > FPS) {
+		isInWave = 0;
+		DeleteFontTexture(textElements[Text_NextEnemyWave].sprite.texture);
+		textElements[Text_NextEnemyWave].size = 69;
+		textElements[Text_NextEnemyWave].sprite = GetTextSprite(textElements[Text_NextEnemyWave].sprite.color, textElements[Text_NextEnemyWave].size, "Wave %i In %01d", gameInstance.enemyWave, (secondsToNextWave / 60));
+		isWaveCountDownVisible = 1;
+	}
+
+	if (isInWave == 1) {
+		if (--removeWaveSecondsTimer <= 0) {
+			DeleteFontTexture(textElements[Text_NextEnemyWave].sprite.texture);
+			textElements[Text_NextEnemyWave].size = 0;
+			textElements[Text_NextEnemyWave].sprite = GetTextSprite(textElements[Text_NextEnemyWave].sprite.color, textElements[Text_NextEnemyWave].size, "Wave %i In %01d", gameInstance.enemyWave, (secondsToNextWave / 60));
+			isWaveCountDownVisible = 0;
+		}
+	}
+}
+
 static void Draw() {
 	DrawBackground();
 	DrawStarfield();
@@ -475,6 +541,12 @@ static void DrawEnemies() {
 	Entity* enemy;
 
 	for (enemy = gameInstance.entity_IndexFirst.next; enemy != NULL; enemy = enemy->next) {
+		if (enemy->position.y < 0) {
+			enemy->position.y = 0;
+		}
+		if (enemy->position.y > SCREEN_HEIGHT - enemy->sprite.height) {
+			enemy->position.y = SCREEN_HEIGHT - enemy->sprite.height;
+		}
 		DrawTexture(enemy->sprite, enemy->position);
 	}
 }
@@ -612,12 +684,12 @@ static void FireEnemyBullet(Entity* entity) {
 	CalculateDirection(playerPosition, entityPosition, &bullet->velocity.x, &bullet->velocity.y);
 	bullet->sprite.rotation = 90;
 
-	bullet->velocity.x *= ENEMY_BULLET_SPEED;
-	bullet->velocity.y *= ENEMY_BULLET_SPEED;
+	bullet->velocity.x *= (ENEMY_BULLET_SPEED + gameInstance.enemyWave - 1);
+	bullet->velocity.y *= (ENEMY_BULLET_SPEED + gameInstance.enemyWave - 1);
 
 	bullet->side = SIDE_ENEMY;
 
-	entity->reload = (rand() % FPS * 4);
+	entity->reload = (rand() % FPS * 4) - (gameInstance.enemyWave * 2);
 
 	PlaySound(Sound_EnemyFire, ChannelEnemyFire);
 
@@ -628,33 +700,44 @@ static void SpawnEnemies() {
 	Entity* enemy;
 
 	if (--enemySpawnTimer <= 0) {
-		enemy = malloc(sizeof(Entity));
-		memset(enemy, 0, sizeof(Entity));
 
-		gameInstance.entity_IndexLast->next = enemy;
-		gameInstance.entity_IndexLast = enemy;
+		if (spawnedEnemies < spawnedEnemiesCap && isInWave == 1) {
+			spawnedEnemiesInternal++;
+			spawnedEnemies++;
+			enemy = malloc(sizeof(Entity));
+			memset(enemy, 0, sizeof(Entity));
 
-		enemy->position.x = SCREEN_WIDTH;
-		enemy->position.y = rand() % SCREEN_HEIGHT;
-		enemy->sprite.texture = enemyTexture;
-		enemy->sprite.rotation = 270;
-		enemy->side = SIDE_ENEMY;
-		enemy->health = 2;
+			gameInstance.entity_IndexLast->next = enemy;
+			gameInstance.entity_IndexLast = enemy;
 
-		SDL_QueryTexture(enemy->sprite.texture, NULL, NULL, &enemy->sprite.width, &enemy->sprite.height);
+			enemy->position.x = SCREEN_WIDTH;
+			enemy->position.y = rand() % SCREEN_HEIGHT;
+			enemy->sprite.texture = enemyTexture;
+			enemy->sprite.rotation = 270;
+			enemy->side = SIDE_ENEMY;
+			enemy->health = 2;
 
-		SDL_Rect rect;
-		rect.x = 0;
-		rect.y = 0;
-		rect.w = enemy->sprite.width;
-		rect.h = enemy->sprite.height;
+			SDL_QueryTexture(enemy->sprite.texture, NULL, NULL, &enemy->sprite.width, &enemy->sprite.height);
 
-		enemy->sprite.rect = rect;
+			SDL_Rect rect;
+			rect.x = 0;
+			rect.y = 0;
+			rect.w = enemy->sprite.width;
+			rect.h = enemy->sprite.height;
 
-		enemy->velocity.x = -(2 + (rand() % 4));
+			enemy->sprite.rect = rect;
+
+			enemy->velocity.x = -(2 + (rand() % 4));
+
+			enemy->reload = FPS * (1 + (rand() % 3)) - (gameInstance.enemyWave * 2);
+
+			hasLastEnemyInWaveSpawned = 0;
+		}
+		else {
+			hasLastEnemyInWaveSpawned = 1;
+		}
 
 		enemySpawnTimer = 30 + (rand() % 60);
-		enemy->reload = FPS * (1 + (rand() % 3));
 	}
 }
 

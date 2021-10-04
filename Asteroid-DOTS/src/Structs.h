@@ -95,6 +95,7 @@ typedef struct {
 	int score;
 	int playerShots;
 	int enemyDeaths;
+	int enemyWave;
 } GameInstance;
 
 

@@ -24,6 +24,7 @@
     <ProjectGuid>{0d8cd420-9754-48e3-9788-ed8b0a892ba6}</ProjectGuid>
     <RootNamespace>AsteroidDOTS</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>SpaceshipShooter-DOTS</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

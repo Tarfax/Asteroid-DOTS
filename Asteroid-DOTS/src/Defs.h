@@ -22,7 +22,7 @@
 #define MAX_STARS 500
 
 #define MAX_TEXT_LENGTH 1024
-#define TEXT_ELEMENTS 5
+#define TEXT_ELEMENTS 6
 
 
 enum {
@@ -48,4 +48,6 @@ enum {
 	Text_EnemyDeaths = 2,
 	Text_Score = 3,
 	Text_HighScore = 4,
+	Text_NextEnemyWave = 5
+
 };

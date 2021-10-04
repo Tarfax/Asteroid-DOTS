@@ -6,6 +6,7 @@
 static void InitPlayer();
 static void InitStarfield();
 static void InitTextElements();
+static void InitNextWave();
 
 static void Update();
 static void UpdateBackground();
@@ -16,6 +17,7 @@ static void UpdateStarfield();
 static void UpdateExplosions();
 static void UpdateDebris();
 static void UpdateScorePads();
+static void UpdateCountdownWaveCounter();
 
 static void Draw();
 static void DrawBackground();
@@ -31,7 +33,7 @@ static void DrawScorePads();
 static void Fire();
 static void FireEnemyBullet(Entity* entity);
 static void SpawnEnemies();
-static void SpawnScorePads();
+static void SpawnScorePads(Vector2 position);
 static void CreateExplosion(Vector2 position, int count);
 static void CalculateDirection(Vector2 a, Vector2 b, float* deltaX, float* deltaY);
 static void ResetGame();
@@ -63,6 +65,16 @@ int enemySpawnTimer;
 int gameResetTimer;
 int playerDeaths;
 int highScore;
+
+int secondsToNextWave;
+int removeWaveSecondsTimer;
+int isWaveCountDownVisible;
+
+int isInWave;
+int spawnedEnemies;
+int spawnedEnemiesInternal;
+int spawnedEnemiesCap;
+int hasLastEnemyInWaveSpawned;
 
 int backgroundX;
 
