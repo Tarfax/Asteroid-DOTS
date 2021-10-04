@@ -18,6 +18,29 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Engine\Draw.c" />
+    <ClCompile Include="src\Engine\Init.c" />
+    <ClCompile Include="src\Engine\Input.c" />
+    <ClCompile Include="src\Engine\Physics.c" />
+    <ClCompile Include="src\Engine\Sound.c" />
+    <ClCompile Include="src\Engine\Text.c" />
+    <ClCompile Include="src\Game\GameInstance.c" />
+    <ClCompile Include="src\main.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Common.h" />
+    <ClInclude Include="src\Defs.h" />
+    <ClInclude Include="src\Engine\Draw.h" />
+    <ClInclude Include="src\Engine\Init.h" />
+    <ClInclude Include="src\Engine\Input.h" />
+    <ClInclude Include="src\Engine\Physics.h" />
+    <ClInclude Include="src\Engine\Sound.h" />
+    <ClInclude Include="src\Engine\Text.h" />
+    <ClInclude Include="src\Game\GameInstance.h" />
+    <ClInclude Include="src\main.h" />
+    <ClInclude Include="src\Structs.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -119,7 +142,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Asteroid-DOTS\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\SpaceshipShooter-DOTS\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,29 +166,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="src\Engine\Sound.h" />
-    <ClInclude Include="src\Common.h" />
-    <ClInclude Include="src\Defs.h" />
-    <ClInclude Include="src\Engine\Draw.h" />
-    <ClInclude Include="src\Engine\Init.h" />
-    <ClInclude Include="src\Engine\Input.h" />
-    <ClInclude Include="src\Engine\Physics.h" />
-    <ClInclude Include="src\Game\GameInstance.h" />
-    <ClInclude Include="src\main.h" />
-    <ClInclude Include="src\Structs.h" />
-    <ClInclude Include="src\Engine\Text.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\Engine\Sound.c" />
-    <ClCompile Include="src\Engine\Draw.c" />
-    <ClCompile Include="src\Engine\Init.c" />
-    <ClCompile Include="src\Engine\Input.c" />
-    <ClCompile Include="src\Engine\Physics.c" />
-    <ClCompile Include="src\Game\GameInstance.c" />
-    <ClCompile Include="src\main.c" />
-    <ClCompile Include="src\Engine\Text.c" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
